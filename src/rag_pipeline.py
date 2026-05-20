@@ -1,6 +1,6 @@
 import re
 import json
-import google.generativeai as genai
+from google import genai
 import chromadb
 from chromadb.utils import embedding_functions
 from difflib import SequenceMatcher
@@ -21,8 +21,7 @@ class HadithRAG:
     """
 
     def __init__(self, api_key: str):
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel("gemini-1.5-flash")
+        self.client = genai.Client(api_key=api_key)
         self._init_vectorstore()
 
     def _init_vectorstore(self):
@@ -141,7 +140,10 @@ Provide a clear, helpful answer that:
 3. Is respectful and educational in tone
 4. Mentions if there are multiple relevant narrations"""
 
-        response = self.model.generate_content(prompt)
+        response = self.client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+        )
         return response.text
 
     # ── MAIN QUERY ────────────────────────────────────────────────────────────
